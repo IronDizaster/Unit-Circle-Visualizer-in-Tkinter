@@ -2,7 +2,7 @@ import math
 from tkinter import *
 from tkinter import messagebox
 
-
+# All code is original and written by IronDizaster in 2023. AI has been used only for documentation and comments.
 root = Tk()
 
 
@@ -40,6 +40,7 @@ canvas = Canvas(root, width = WINDOW_WIDTH, height = WINDOW_HEIGHT, bg = BG_COLO
 canvas.pack()
 
 def center_screen():
+    '''Centers the application window on the user's screen and sets the window title.'''
     screen_width = root.winfo_screenwidth()  # Width of the user screen.
     screen_height = root.winfo_screenheight() # Height of the user screen.
 
@@ -52,6 +53,7 @@ def center_screen():
     root.title(TITLE + TM)
 
 def update_unit_circle(): 
+    '''Draws and updates all elements of the unit circle and trigonometric visualizations on the canvas.'''
     arrow = 'last' if unit_circle_radius > 45 else 'none'
     point_radius = math.log(unit_circle_radius ** scale)
     text_offset_y = 1 + math.sqrt(unit_circle_radius)
@@ -278,6 +280,7 @@ def update_unit_circle():
     hide_functions()
 
 def update_analytics():
+    '''Displays analytics information (angle, trig values, etc.) on the canvas.'''
     if ui_hidden: return
     PADDING = 25
     canvas.delete('info')
@@ -336,6 +339,7 @@ def update_analytics():
                        anchor='e', tag='info UI')
  
 def hide_functions():
+    '''Hides all trigonometric function visuals except the selected one.'''
     if show_only_sine:
         func_to_show = 'sine'
     elif show_only_cos:
@@ -353,6 +357,7 @@ def hide_functions():
                 canvas.itemconfig(function, state="hidden")
 
 def animate():
+    '''Animates the rotation of the unit circle if not paused.'''
     global angle
     if not paused:
         angle += anim_speed
@@ -362,6 +367,7 @@ def animate():
         canvas.after(10, animate)
 
 def cartesian_axis():
+    '''Draws the cartesian axes and grid on the canvas.'''
     canvas.delete('cartesian')
     canvas.delete('grid')
     font_size = round(math.log(unit_circle_radius ** 2))
@@ -415,12 +421,14 @@ def cartesian_axis():
         canvas.itemconfig('grid', state='normal')
     canvas.tag_lower('grid')
 def create_pause_icon():
+    '''Draws a pause icon on the canvas when animation is paused.'''
     canvas.delete('pause')
     canvas.create_rectangle(25, WINDOW_HEIGHT - 100, 50, WINDOW_HEIGHT - 25, fill = 'gray', tag='pause', width=0)
     canvas.create_rectangle(66, WINDOW_HEIGHT - 100, 91, WINDOW_HEIGHT - 25, fill = 'gray', tag='pause', width=0)
 
 
 def delete_all_except_UI():
+    '''Deletes all canvas items except those tagged as UI.'''
     all_items = canvas.find_all()
     for item in all_items:
         tags = canvas.gettags(item)
@@ -428,6 +436,10 @@ def delete_all_except_UI():
             canvas.delete(item)
 
 def zoom(event):
+    '''Handles mouse wheel events to zoom in/out the unit circle.
+    Args:
+        event (tkinter.Event): The mouse wheel event.
+    '''
     global unit_circle_radius
     global angle
 
@@ -449,6 +461,10 @@ def zoom(event):
 
 
 def pause(event):
+    '''Toggles the animation pause state and updates the UI accordingly.
+    Args:
+        event (tkinter.Event): The event that triggered the pause.
+    '''
     global paused
     paused = not paused
     if paused:
@@ -458,6 +474,10 @@ def pause(event):
         animate()
 
 def increase_anim_speed(event):
+    '''Increases the animation speed and updates the analytics display.
+    Args:
+        event (tkinter.Event): The event that triggered the speed increase.
+    '''
     global anim_speed
     if anim_speed < 8:
         anim_speed += 0.1
@@ -467,6 +487,10 @@ def increase_anim_speed(event):
     canvas.itemconfig(ui_buttons[7], fill='lightgreen')
 
 def decrease_anim_speed(event):
+    '''Decreases the animation speed and updates the analytics display.
+    Args:
+        event (tkinter.Event): The event that triggered the speed decrease.
+    '''
     global anim_speed
     if anim_speed > 0.1:
         anim_speed -= 0.1
@@ -476,6 +500,7 @@ def decrease_anim_speed(event):
     canvas.itemconfig(ui_buttons[8], fill='lightgreen')
 
 def create_filter_buttons():
+    '''Creates filter and control buttons for the UI on the canvas.'''
     if ui_hidden: return
     a = 60
     padding = 25
@@ -559,11 +584,19 @@ def create_filter_buttons():
 
 
 def change_color_of_button(identifier):
+    '''Highlights the selected UI button and resets others to default color.
+    Args:
+        identifier (int): The index of the button to highlight.
+    '''
     for i in range(len(ui_buttons)):
         canvas.itemconfig(ui_buttons[i], fill=BG_COLOR)
     canvas.itemconfig(ui_buttons[identifier], fill='LightGreen')
 
 def filter_functions(tag):
+    '''Sets which trigonometric function(s) to display based on the selected tag.
+    Args:
+        tag (str): The tag indicating which function(s) to display (e.g., 'sine', 'cosine', etc.).
+    '''
     global show_only_sine
     global show_only_cos
     global show_only_cotg
@@ -592,6 +625,10 @@ def filter_functions(tag):
     update_unit_circle()
 
 def on_key_press(event):
+    '''Handles key press events to filter functions based on the pressed key.
+    Args:
+        event (tkinter.Event): The key press event containing the pressed key.
+    '''
     key_mapping = {
         "q": 'sine',
         "w": 'cosine',
@@ -604,7 +641,15 @@ def on_key_press(event):
         filter_functions(tag)
 
 
-def get_angle(x, y, rounding):
+def get_angle(x: float, y: float, rounding: int) -> float:
+    '''Calculate the angle in degrees based on the mouse position.
+    Args:
+        x (float): The x-coordinate of the mouse.
+        y (float): The y-coordinate of the mouse.
+        rounding (int): The rounding value for the angle. Default is 0 (no rounding).
+    Returns:
+        float: The angle in degrees, rounded to the specified value.
+    '''
     dx = x - WINDOW_X_CENTER
     dy = WINDOW_Y_CENTER - y
     angle = math.degrees(math.atan2(dy, dx))
@@ -613,11 +658,20 @@ def get_angle(x, y, rounding):
     else:
         return (round(angle / rounding) * rounding) % 360
 def on_mouse_down(event):
-    # Change cursor to hand when mouse button is pressed
+    '''Handles mouse button press event to set the angle and changes cursor to a hand to improve user experience.
+    Args:
+        event (tkinter.Event): The mouse event containing the x and y coordinates.
+    '''
     set_angle(event.x, event.y)
     root.config(cursor="tcross")
 
 def set_angle(mouse_x: float, mouse_y: float, rounding = 0):
+    '''Sets the angle based on mouse position and updates the unit circle.
+    Args:
+        mouse_x (float): The x-coordinate of the mouse.
+        mouse_y (float): The y-coordinate of the mouse.
+        rounding (int, optional): The rounding value for the angle. Default is 0 (no rounding).
+    '''
     global angle
     global paused
     paused = True
@@ -631,20 +685,40 @@ def set_angle(mouse_x: float, mouse_y: float, rounding = 0):
     update_analytics()
 
 def on_mouse_move(event):
+    '''Handles mouse movement while the left mouse button is held down to update the angle.
+    Args:
+        event (tkinter.Event): The mouse move event.
+    '''
     set_angle(event.x, event.y)
 
 def on_mouse_up(event):
+    '''Handles mouse button release event to reset the cursor and remove angle tooltip.
+    Args:
+        event (tkinter.Event): The mouse button release event.
+    '''
     root.config(cursor="")
     canvas.delete('angletooltip')
     
 def on_right_mouse_move(event):
+    '''Handles right mouse movement to set angle in increments defined by global_rounding.
+    Args:
+        event (tkinter.Event): The right mouse move event.
+    '''
     set_angle(event.x, event.y, global_rounding)
 
 def on_right_mouse_down(event):
+    '''Handles right mouse button press to set angle in increments and change cursor.
+    Args:
+        event (tkinter.Event): The right mouse button press event.
+    '''
     set_angle(event.x, event.y, global_rounding)
     root.config(cursor="tcross")
 
 def map_key_release(event):
+    '''Resets the color of UI buttons when their corresponding key is released.
+    Args:
+        event (tkinter.Event): The key release event.
+    '''
     pressed = event.keysym.lower()
     if pressed == 'a':
         canvas.itemconfig(ui_buttons[5], fill=BG_COLOR)
@@ -660,6 +734,10 @@ def map_key_release(event):
         canvas.itemconfig(ui_buttons[10], fill=BG_COLOR)
 
 def round_angle(event):
+    '''Rounds the current angle to the nearest integer and updates the display.
+    Args:
+        event (tkinter.Event): The event that triggered rounding.
+    '''
     global angle
     angle = round(angle)
     update_unit_circle()
@@ -667,6 +745,10 @@ def round_angle(event):
     update_analytics()
 
 def reset(event):
+    '''Resets the angle, scale, and animation speed to their default values.
+    Args:
+        event (tkinter.Event): The event that triggered the reset.
+    '''
     global angle
     global scale
     global anim_speed
@@ -681,6 +763,10 @@ def reset(event):
 
 ui_hidden = False
 def hide_ui(event):
+    '''Toggles the visibility of the UI elements on the canvas.
+    Args:
+        event (tkinter.Event): The event that triggered the UI toggle.
+    '''
     global ui_hidden
     ui_hidden = not ui_hidden
     if ui_hidden:
@@ -692,17 +778,29 @@ def hide_ui(event):
 is_fullscreen = True
 root.attributes("-fullscreen", is_fullscreen)
 def toggle_fullscreen(event):
+    '''Toggles fullscreen mode for the application window.
+    Args:
+        event (tkinter.Event): The event that triggered fullscreen toggle.
+    '''
     global is_fullscreen
     is_fullscreen = not is_fullscreen 
     root.attributes("-fullscreen", is_fullscreen)
 
 def exit_fullscreen(event):
+    '''Exits fullscreen mode for the application window.
+    Args:
+        event (tkinter.Event): The event that triggered exit from fullscreen.
+    '''
     global is_fullscreen
     is_fullscreen = False
     root.attributes("-fullscreen", is_fullscreen)
 
 grid_hidden = False
 def hide_grid(event):
+    '''Toggles the visibility of the grid on the canvas.
+    Args:
+        event (tkinter.Event): The event that triggered the grid toggle.
+    '''
     global grid_hidden
     grid_hidden = not grid_hidden
     if grid_hidden:
@@ -712,6 +810,10 @@ def hide_grid(event):
     canvas.itemconfig(ui_buttons[10], fill='lightgreen')
 
 def increase_line_width(event):
+    '''Increases the width of lines and points in the visualization.
+    Args:
+        event (tkinter.Event): The event that triggered the increase.
+    '''
     global scale
     if scale < 1:
         scale += 0.1
@@ -724,6 +826,10 @@ def increase_line_width(event):
     canvas.tag_lower('arc')
 
 def decrease_line_width(event):
+    '''Decreases the width of lines and points in the visualization.
+    Args:
+        event (tkinter.Event): The event that triggered the decrease.
+    '''
     global scale
     if scale > 0.1:
         scale -= 0.1
@@ -736,6 +842,10 @@ def decrease_line_width(event):
     canvas.tag_lower('arc')
 
 def confirm_exit(event):
+    '''Asks the user for confirmation before closing the application.
+    Args:
+        event (tkinter.Event): The event that triggered the exit confirmation.
+    '''
     answer = messagebox.askyesno("Confirm Exit", "Are you sure you want to quit?")
     if answer:
         root.destroy()
@@ -760,7 +870,7 @@ root.bind("<ButtonRelease-3>", on_mouse_up)
 root.bind("<B1-Motion>", on_mouse_move)
 root.bind("<B3-Motion>", on_right_mouse_move)
 root.bind("<a>", round_angle)
-root.bind("<A>", round_angle) # when CAPS is on it doesnt register button press (terrible fix but im lazy)
+root.bind("<A>", round_angle) # when CAPS is on it doesnt register button press (lazy fix but who cares)
 root.bind("<x>", reset)
 root.bind("<X>", reset)
 root.bind("<h>", hide_ui)
