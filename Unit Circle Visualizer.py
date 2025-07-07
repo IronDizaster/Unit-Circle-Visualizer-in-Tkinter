@@ -2,7 +2,7 @@ import math
 from tkinter import *
 from tkinter import messagebox
 
-# All code is original and written by IronDizaster in 2023. AI has been used only for documentation and comments.
+# All code is original and written by IronDizaster in 2024. AI has been used only for documentation and comments.
 root = Tk()
 
 
